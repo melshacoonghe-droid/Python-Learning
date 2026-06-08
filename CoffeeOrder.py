@@ -11,6 +11,7 @@ F = "Hot Chocolate"
 print("Hi, What would you like to order today A =", A , "B =" ,B , "C=", C, "D =", D, "E=", E, "or F=", F, "? (Please input the Letter of your order )")
 Customer_Order = input()
 
+
 if Customer_Order == "A":
     print("The bill for your",A,"is Rs.700")
 elif Customer_Order == "B":
@@ -24,4 +25,5 @@ elif Customer_Order == "E":
 else: 
     print("The bill for your",F,"is Rs.750")
 
+print("Would you like to order any other food")
 print("Thank you for ordering. Have a nice day.")
