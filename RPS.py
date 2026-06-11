@@ -29,6 +29,4 @@ while True:
 
     play_again = input("\nPlay again? (yes/no): ").lower()
 
-    if play_again != "yes":
-        print("Thanks for playing!")
-        break
+    
