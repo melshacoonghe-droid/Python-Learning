@@ -192,18 +192,3 @@ while pet.alive():
 
     elif choice == "8":
         print("\nThanks for playing!")
-        break
-
-    else:
-        print("\nInvalid choice.")
-
-    if not pet.alive():
-        break
-
-if pet.health <= 0:
-    print("\n💀 Your pet became too unhealthy.")
-    print("Game Over.")
-
-print("\nFinal Stats")
-pet.show_stats()
-print("\nGoodbye!")
