@@ -1,451 +1,209 @@
 import random
-import json
-import os
+import time
 
-# ==========================================
-# PROCEDURAL DUNGEON RPG
-# ==========================================
-
-SAVE_FILE = "rpg_save.json"
-
-
-class Player:
+class Pet:
     def __init__(self, name):
         self.name = name
-        self.hp = 100
-        self.max_hp = 100
-        self.attack = 15
+        self.hunger = 50
+        self.happiness = 50
+        self.energy = 50
+        self.cleanliness = 50
+        self.health = 100
         self.level = 1
         self.exp = 0
-        self.gold = 0
-        self.potions = 3
+        self.day = 1
 
-    def heal(self):
-        if self.potions > 0:
-            heal_amount = random.randint(20, 40)
-            self.hp = min(self.max_hp, self.hp + heal_amount)
-            self.potions -= 1
-            print(f"\nYou healed {heal_amount} HP.")
-        else:
-            print("\nNo potions available.")
-
-    def gain_exp(self, amount):
-        self.exp += amount
-        print(f"\nGained {amount} EXP.")
-
-        while self.exp >= self.level * 50:
-            self.exp -= self.level * 50
-            self.level += 1
-            self.max_hp += 20
-            self.attack += 5
-            self.hp = self.max_hp
-
-            print("\nLEVEL UP!")
-            print(f"Level: {self.level}")
-            print(f"Attack: {self.attack}")
-            print(f"Max HP: {self.max_hp}")
-
-    def display(self):
-        print("\n======== PLAYER ========")
-        print(f"Name: {self.name}")
+    def show_stats(self):
+        print("\n" + "=" * 40)
+        print(f"Day: {self.day}")
+        print(f"Pet: {self.name}")
         print(f"Level: {self.level}")
-        print(f"HP: {self.hp}/{self.max_hp}")
-        print(f"Attack: {self.attack}")
-        print(f"EXP: {self.exp}")
-        print(f"Gold: {self.gold}")
-        print(f"Potions: {self.potions}")
-        print("========================")
+        print(f"EXP: {self.exp}/100")
+        print("-" * 40)
+        print(f"Health      : {self.health}")
+        print(f"Hunger      : {self.hunger}")
+        print(f"Happiness   : {self.happiness}")
+        print(f"Energy      : {self.energy}")
+        print(f"Cleanliness : {self.cleanliness}")
+        print("=" * 40)
 
+    def feed(self):
+        print(f"\nYou fed {self.name}.")
+        self.hunger = max(0, self.hunger - 25)
+        self.exp += 10
 
-class Enemy:
-    def __init__(self, level):
-        names = [
-            "Goblin",
-            "Skeleton",
-            "Bandit",
-            "Orc",
-            "Dark Mage",
-            "Slime",
-            "Wolf"
-        ]
+    def play(self):
+        print(f"\nYou played with {self.name}.")
+        self.happiness = min(100, self.happiness + 20)
+        self.energy = max(0, self.energy - 15)
+        self.hunger += 10
+        self.exp += 15
 
-        self.name = random.choice(names)
-        self.level = level
+    def sleep(self):
+        print(f"\n{self.name} took a nap.")
+        self.energy = min(100, self.energy + 35)
+        self.hunger += 10
+        self.exp += 8
 
-        self.hp = 30 + (level * 10)
-        self.attack = 5 + (level * 3)
+    def clean(self):
+        print(f"\nYou cleaned {self.name}.")
+        self.cleanliness = 100
+        self.exp += 10
 
-    def display(self):
-        print(f"\n{self.name} (Lv.{self.level})")
-        print(f"HP: {self.hp}")
-        print(f"ATK: {self.attack}")
+    def medicine(self):
+        if self.health < 100:
+            print(f"\nYou gave medicine to {self.name}.")
+            self.health = min(100, self.health + 25)
+        else:
+            print("\nYour pet is already healthy.")
 
+    def next_day(self):
+        self.day += 1
 
-class Dungeon:
-    def __init__(self):
-        self.floor = 1
+        self.hunger += random.randint(5, 15)
+        self.energy -= random.randint(5, 12)
+        self.cleanliness -= random.randint(4, 10)
+        self.happiness -= random.randint(2, 8)
 
-    def next_floor(self):
-        self.floor += 1
+        self.hunger = min(100, self.hunger)
+        self.energy = max(0, self.energy)
+        self.cleanliness = max(0, self.cleanliness)
+        self.happiness = max(0, self.happiness)
 
+        self.check_health()
+        self.random_event()
+        self.level_up()
 
-def save_game(player, dungeon):
-    data = {
-        "name": player.name,
-        "hp": player.hp,
-        "max_hp": player.max_hp,
-        "attack": player.attack,
-        "level": player.level,
-        "exp": player.exp,
-        "gold": player.gold,
-        "potions": player.potions,
-        "floor": dungeon.floor
-    }
+    def check_health(self):
+        if self.hunger > 80:
+            self.health -= 10
 
-    with open(SAVE_FILE, "w") as f:
-        json.dump(data, f)
+        if self.energy < 20:
+            self.health -= 8
 
-    print("\nGame Saved.")
+        if self.cleanliness < 20:
+            self.health -= 7
 
+        if self.happiness < 15:
+            self.health -= 6
 
-def load_game():
-    if not os.path.exists(SAVE_FILE):
-        return None, None
+        self.health = max(0, self.health)
 
-    with open(SAVE_FILE, "r") as f:
-        data = json.load(f)
+    def random_event(self):
+        event = random.randint(1, 8)
 
-    player = Player(data["name"])
+        if event == 1:
+            print("\n⭐ Your pet found a treasure!")
+            self.exp += 30
 
-    player.hp = data["hp"]
-    player.max_hp = data["max_hp"]
-    player.attack = data["attack"]
-    player.level = data["level"]
-    player.exp = data["exp"]
-    player.gold = data["gold"]
-    player.potions = data["potions"]
+        elif event == 2:
+            print("\n🌧 Your pet got caught in rain.")
+            self.cleanliness -= 20
 
-    dungeon = Dungeon()
-    dungeon.floor = data["floor"]
+        elif event == 3:
+            print("\n🎉 Birthday celebration!")
+            self.happiness += 25
 
-    return player, dungeon
+        elif event == 4:
+            print("\n🤒 Your pet caught a cold.")
+            self.health -= 15
 
+        elif event == 5:
+            print("\n🍖 Found extra food!")
+            self.hunger -= 20
 
-def battle(player, enemy):
-    print("\nA battle begins!")
+        elif event == 6:
+            print("\n😴 Your pet overslept.")
+            self.energy += 20
 
-    while player.hp > 0 and enemy.hp > 0:
-
-        print("\n1. Attack")
-        print("2. Heal")
-
-        choice = input("> ")
-
-        if choice == "1":
-            damage = random.randint(
-                player.attack - 5,
-                player.attack + 5
-            )
-
-            enemy.hp -= damage
-
-            print(
-                f"\nYou hit the {enemy.name} "
-                f"for {damage} damage!"
-            )
-
-        elif choice == "2":
-            player.heal()
+        elif event == 7:
+            print("\n🏃 Morning exercise.")
+            self.health += 5
+            self.energy -= 10
 
         else:
-            print("Invalid action.")
-            continue
+            print("\nNothing special happened today.")
 
-        if enemy.hp <= 0:
-            print(f"\nYou defeated {enemy.name}!")
+        self.health = max(0, min(100, self.health))
+        self.energy = max(0, min(100, self.energy))
+        self.happiness = max(0, min(100, self.happiness))
+        self.cleanliness = max(0, min(100, self.cleanliness))
+        self.hunger = max(0, min(100, self.hunger))
 
-            exp_gain = enemy.level * 20
-            gold_gain = enemy.level * 15
+    def level_up(self):
+        while self.exp >= 100:
+            self.exp -= 100
+            self.level += 1
+            self.health = 100
+            print(f"\n🎉 {self.name} leveled up!")
+            print(f"New Level: {self.level}")
 
-            player.gain_exp(exp_gain)
-
-            player.gold += gold_gain
-
-            print(
-                f"Found {gold_gain} gold!"
-            )
-
-            return True
-
-        enemy_damage = random.randint(
-            enemy.attack - 2,
-            enemy.attack + 2
-        )
-
-        player.hp -= enemy_damage
-
-        print(
-            f"{enemy.name} attacks "
-            f"for {enemy_damage} damage!"
-        )
-
-        print(
-            f"Your HP: "
-            f"{max(player.hp,0)}"
-        )
-
-    return False
+    def alive(self):
+        return self.health > 0
 
 
-def treasure_room(player):
-    print("\nTREASURE ROOM!")
-
-    reward = random.randint(1, 4)
-
-    if reward == 1:
-        gold = random.randint(50, 120)
-        player.gold += gold
-
-        print(
-            f"You found {gold} gold!"
-        )
-
-    elif reward == 2:
-        player.potions += 2
-
-        print(
-            "You found 2 potions!"
-        )
-
-    elif reward == 3:
-        player.attack += 2
-
-        print(
-            "Attack permanently increased!"
-        )
-
-    else:
-        player.max_hp += 10
-        player.hp += 10
-
-        print(
-            "Max HP permanently increased!"
-        )
+def menu():
+    print("\nChoose an action")
+    print("1. Feed")
+    print("2. Play")
+    print("3. Sleep")
+    print("4. Clean")
+    print("5. Give Medicine")
+    print("6. View Stats")
+    print("7. End Day")
+    print("8. Quit")
 
 
-def shop(player):
-    while True:
-        print("\n=== SHOP ===")
-        print("1. Potion (30 Gold)")
-        print("2. Attack Upgrade (100 Gold)")
-        print("3. Leave")
+print("=" * 45)
+print("      VIRTUAL PET SIMULATOR")
+print("=" * 45)
 
-        choice = input("> ")
+pet_name = input("Name your pet: ")
+pet = Pet(pet_name)
 
-        if choice == "1":
-            if player.gold >= 30:
-                player.gold -= 30
-                player.potions += 1
+while pet.alive():
 
-                print("Potion purchased.")
-            else:
-                print("Not enough gold.")
+    menu()
 
-        elif choice == "2":
-            if player.gold >= 100:
-                player.gold -= 100
-                player.attack += 3
+    choice = input("Enter choice: ")
 
-                print("Attack upgraded.")
-            else:
-                print("Not enough gold.")
+    if choice == "1":
+        pet.feed()
 
-        elif choice == "3":
-            break
+    elif choice == "2":
+        pet.play()
 
+    elif choice == "3":
+        pet.sleep()
 
-def random_event(player, dungeon):
-    event = random.randint(1, 100)
+    elif choice == "4":
+        pet.clean()
 
-    if event <= 50:
-        enemy = Enemy(dungeon.floor)
+    elif choice == "5":
+        pet.medicine()
 
-        enemy.display()
+    elif choice == "6":
+        pet.show_stats()
 
-        victory = battle(
-            player,
-            enemy
-        )
+    elif choice == "7":
+        print("\nA new day begins...")
+        time.sleep(1)
+        pet.next_day()
 
-        if not victory:
-            print(
-                "\nYou were defeated..."
-            )
-            return False
-
-    elif event <= 75:
-        treasure_room(player)
-
-    elif event <= 90:
-        shop(player)
+    elif choice == "8":
+        print("\nThanks for playing!")
+        break
 
     else:
-        print(
-            "\nA peaceful room."
-        )
+        print("\nInvalid choice.")
 
-        heal = random.randint(
-            10,
-            25
-        )
+    if not pet.alive():
+        break
 
-        player.hp = min(
-            player.max_hp,
-            player.hp + heal
-        )
+if pet.health <= 0:
+    print("\n💀 Your pet became too unhealthy.")
+    print("Game Over.")
 
-        print(
-            f"Recovered {heal} HP."
-        )
-
-    return True
-
-
-def boss_battle(player, dungeon):
-    print("\nBOSS FLOOR!")
-
-    boss = Enemy(
-        dungeon.floor + 3
-    )
-
-    boss.name = "Dungeon Lord"
-
-    boss.hp *= 2
-    boss.attack += 8
-
-    boss.display()
-
-    return battle(player, boss)
-
-
-def main_menu():
-    print("\n====================")
-    print("DUNGEON EXPLORER RPG")
-    print("====================")
-    print("1. New Game")
-    print("2. Load Game")
-    print("3. Quit")
-
-    return input("> ")
-
-
-def game_loop(player, dungeon):
-
-    while True:
-
-        print(
-            f"\n===== FLOOR "
-            f"{dungeon.floor} ====="
-        )
-
-        player.display()
-
-        print("\n1. Explore")
-        print("2. Save")
-        print("3. Quit")
-
-        choice = input("> ")
-
-        if choice == "1":
-
-            if dungeon.floor % 5 == 0:
-
-                victory = boss_battle(
-                    player,
-                    dungeon
-                )
-
-                if not victory:
-                    print(
-                        "\nGame Over."
-                    )
-                    break
-
-                print(
-                    "\nBoss defeated!"
-                )
-
-            else:
-                alive = random_event(
-                    player,
-                    dungeon
-                )
-
-                if not alive:
-                    break
-
-            dungeon.next_floor()
-
-        elif choice == "2":
-            save_game(
-                player,
-                dungeon
-            )
-
-        elif choice == "3":
-            print(
-                "\nThanks for playing!"
-            )
-            break
-
-
-def start_game():
-
-    while True:
-
-        choice = main_menu()
-
-        if choice == "1":
-
-            name = input(
-                "\nHero name: "
-            )
-
-            player = Player(name)
-
-            dungeon = Dungeon()
-
-            game_loop(
-                player,
-                dungeon
-            )
-
-        elif choice == "2":
-
-            player, dungeon = load_game()
-
-            if player is None:
-                print(
-                    "\nNo save file found."
-                )
-            else:
-                print(
-                    "\nSave loaded."
-                )
-
-                game_loop(
-                    player,
-                    dungeon
-                )
-
-        elif choice == "3":
-            break
-
-        else:
-            print(
-                "Invalid choice."
-            )
-
-
-if __name__ == "__main__":
-    start_game()
+print("\nFinal Stats")
+pet.show_stats()
+print("\nGoodbye!")
