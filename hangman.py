@@ -118,3 +118,4 @@ while True:
         print("\n💀 Game Over!")
         print("The word was:", word)
         break
+    print(".")
