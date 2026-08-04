@@ -1,5 +1,4 @@
 
-
 #Shopping Cart Program
 foods = []
 prices = []
