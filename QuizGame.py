@@ -68,16 +68,11 @@ answers.insert(0, "Answers")
 guesses.insert(0, "Guesses")
 statuses.insert(0,"Status")
 
-print(numbers[0], end=" ")
-print(guesses[0], end=" ")
-print(answers[0], end=" ")
-print(statuses[0])
-
-for y in range (1,9) :
-    print(numbers[y], end="          ")
-    print(guesses[y], end="       ")
-    print(answers[y], end="      ")
-    print(statuses[y], end=" ")
+for y in range (0,9) :
+    print(f"{numbers[y]:^7}", end=" ")
+    print(f"{guesses[y]:^7}", end=" ")
+    print(f"{answers[y]:^7}", end=" ")
+    print(f"{statuses[y]:^8}", end=" ")
     print()
 
 print(f"You got {score} questions correct out of 8 questions")

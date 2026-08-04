@@ -38,3 +38,6 @@ for total in totals:
 
 print()
 print(f"Your Total is Rs.{Amount:.2f}")
+
+
+
