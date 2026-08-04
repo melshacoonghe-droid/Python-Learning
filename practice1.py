@@ -1,4 +1,4 @@
-"""
+
 #Validate user input
 #User name must not contain more than 12 characters
 #No spaces or digits
@@ -9,10 +9,10 @@ if len(User_name) <=12 and User_name.isalpha():
     print(f"Congrats! Your User Name is {User_name}")
 else:
     print("Your User name is not valid")
-"""
 
 
-"""
+
+
 #Yearly compound interst Calculator
 p = 0 #principle amount
 r = 0 #rate
@@ -40,9 +40,9 @@ Final = p * (( 1 + (r/100)) **t)
 
 print(f"Your final amount after {t} years would be Rs.{Final:,.2f}")
 
-"""
 
-"""
+
+
 #Countdown Timer Normal
 import time
 
@@ -52,9 +52,9 @@ for x in range(t, 0, -1):
     time.sleep(1)
 
 print("TIME'S UP")
-"""
 
-"""
+
+
 #Countdown Timer Digital
 import time
 
@@ -68,5 +68,5 @@ for x in range(t, 0, -1):
 
 print("TIME'S UP")
 
-"""
+
 
